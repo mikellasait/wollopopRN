@@ -1,8 +1,9 @@
+import useAuth from "@/hooks/useAuth";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useFonts } from "expo-font";
 import { SplashScreen, Stack, useRouter } from "expo-router";
 import { useEffect } from "react";
-import { TouchableOpacity } from "react-native-gesture-handler";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -19,6 +20,12 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const router = useRouter();
+  const { isAuth } = useAuth();
+
+  GoogleSignin.configure({
+    scopes: ["https://www.googleapis.com/auth/drive.readonly"],
+    webClientId: process.env.WEB_CLIENT_ID,
+  });
 
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
@@ -33,7 +40,7 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
-      router.push("/(modals)/login");
+      if (!isAuth) router.push("/(modals)/login");
     }
   }, [loaded]);
 
